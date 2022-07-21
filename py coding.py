@@ -46,4 +46,50 @@ print(df)
 df1 = df.div(df["C"], level=1)
 print(df1)
 
+###### Merge Concat ######
+##########################
+
+# a dictionary to convert to a dataframe
+data1 = {'identification': ['a', 'b', 'c', 'd'],
+'Customer_Name':['King', 'West', 'Adams', 'Mercy'], 'Category':['furniture', 'Office Supplies', 'Technology', 'R_materials'],}
+
+# our second dictionary to convert to a dataframe
+data2 = {'identification': ['a', 'b', 'c', 'd'],
+'Class':['First_Class', 'Second_Class', 'Same_day', 'Standard Class'],
+'Age':[60, 30, 40, 50]}
+
+df1 = pd.DataFrame(data1)
+df2 = pd.DataFrame(data2)
+
+# using .merge() function
+new_data = pd.merge(df1, df2, on='identification')
+#print(new_data)
+
+# y轴concat 相当于append
+ndata = pd.concat([df1,df2],axis=0)
+#print(ndata)
+
+#  和merge能达到一样的效果
+nndata = pd.concat([df1,df2],axis=1)
+print(nndata)
+
+
+df1=pd.DataFrame({'Name':['July','Shiely','Lucy','Lily'],'Salary':[5000,6000,4000,6000]})
+ser1=pd.Series(['US','CN','UK','UK'],index=['July','Shiely','Lucy','Lily'],name='Nation')
+df2=pd.DataFrame({'Name':['July','Shiely','Lucy','Joy','Lily'],'Major':['CS','CS','Art','Art','Math']})
+df3=pd.DataFrame({'Name':['July','Shiely','Lucy','Lily','Joy'],
+                  'University':['Beking','Beking','Tsing','Tsing','Beking']})
+
+# print(df1)
+# print(df2)
+# print(df3)
+# print(ser1)
+
+#用df1.Name字段和Ser1.index匹配
+r1=df1.join(ser1,how='inner',on='Name')
+
+#这里是将Name属性都设为df1和df2的索引然后再进行匹配连接的。这时候就不用写on条件了，
+#同时df1和df2中的Name顺序不一致也可以正常处理。
+#同时sort字段实现了按name的字典序重新排序
+r2=df1.set_index('Name').join(df2.set_index('Name'),how='inner',sort=True)
 
