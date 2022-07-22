@@ -73,7 +73,7 @@ ndata = pd.concat([df1,df2],axis=0)
 nndata = pd.concat([df1,df2],axis=1)
 print(nndata)
 
-
+#### create dataframe ####
 df1=pd.DataFrame({'Name':['July','Shiely','Lucy','Lily'],'Salary':[5000,6000,4000,6000]})
 ser1=pd.Series(['US','CN','UK','UK'],index=['July','Shiely','Lucy','Lily'],name='Nation')
 df2=pd.DataFrame({'Name':['July','Shiely','Lucy','Joy','Lily'],'Major':['CS','CS','Art','Art','Math']})
@@ -93,3 +93,71 @@ r1=df1.join(ser1,how='inner',on='Name')
 #同时sort字段实现了按name的字典序重新排序
 r2=df1.set_index('Name').join(df2.set_index('Name'),how='inner',sort=True)
 
+#other为多个DataFrame组成的列表时，只能实现index对index的匹配，这个时候不能设置on参数
+#而且df2和df3中不能有相同的column
+r3=df1.join([df2.set_index('Name'),df3.set_index('Name')],on='Name',how='outer')
+
+################## Join ##################
+
+#### create dataframe ####
+df1=pd.DataFrame({'No.':range(1000,1004),
+                  'Name':['July','Shiely','Lucy','Lily'],
+                  'Salary':[5000,6000,4000,6000]})
+df2=pd.DataFrame({'No.':range(1000,1005),
+                  'Postion':['Manger','BOSS','BOSS','Manger','Manger'],
+                  'Name':['July','Shiely','Lucy','Lily','Joy'],
+                  'Bounce':[3000,1000,1000,2000,5000]})
+
+#如果df2中的有多层索引时，需要都出现在on条件中才能正确进行匹配
+r4=df1.join(df2.set_index(['No.','Name']),on=['No.','Name'],how='inner')
+#如果没有设置lsuffix或rsuffix则会报错
+r5=df1.join(df2,lsuffix='_left',how='inner')
+
+
+################## Merge ##################
+
+#### create dataframe ####
+df1=pd.DataFrame({'Name':['July','Shiely','Lucy','Lily'],'Salary':[5000,6000,4000,6000]})
+df2=pd.DataFrame({'Name':['July','Shiely','Lucy','Joy','Lily'],'Major':['CS','CS','Art','Art','Math']})
+df3=pd.DataFrame({'Name':['July','Shiely','Lucy','Lily','Kate'],
+                  'University':['Beking','Beking','Tsing','Tsing','SHU']})
+df4=pd.DataFrame({'No.':range(1000,1004),
+                  'Name':['July','Shiely','Lucy','Lily'],
+                  'Salary':[5000,6000,4000,6000]})
+df5=pd.DataFrame({'No.':range(1000,1005),
+                  'Postion':['Manger','BOSS','BOSS','Manger','Manger'],
+                  'Name':['July','Shiely','Lucy','Lily','Joy'],
+                  'Bounce':[3000,1000,1000,2000,5000]})
+
+#df1.merge(df2,on='Name')
+#r1=df1.merge(df2.set_index('Name'),left_on='Name',right_index=True)
+#col-index join, must have on
+#r1=df1.join(df2.set_index('Name'),how='inner',on='Name')
+# index-index join, no need on
+r1=df1.set_index('Name').join(df2.set_index('Name'),how='inner')
+print(r1)
+
+r2=df2.merge(df3,how='outer',indicator='source',validate='one_to_one')
+
+r3=df4.merge(df5,on='No.',suffixes=('_left','_right'))
+r4=df1.set_index('Name').merge(df2.set_index('Name'),left_index=True,right_index=True)
+
+
+################## Concat ##################
+
+se1=pd.Series(['July','Shiely','Lucy','Lily'])
+se2=pd.Series([5000,6000,4000,6000],index=range(1000,1004))
+r1=pd.concat({'name':se1,'salary':se2},axis=0,join='outer')
+#se1和se2也可以放在list或tuple里
+r2=pd.concat({'name':se1,'salary':se2},axis=0,join='outer',ignore_index=True)
+#使用dict进行数据传输的时候，字典的键会作为外层索引的名字或列名
+#所以这里series.name可以为None
+#使用了ignore_index之后，会重新给返回结果设置索引
+df1=pd.DataFrame({'Name':['July','Shiely','Lucy','Lily'],'Salary':[5000,6000,4000,6000]},index=range(1000,1004))
+df2=pd.DataFrame({'Name':['July','Shiely','Lucy','Joy','Lily'],'Major':['CS','CS','Art','Art','Math']},
+                index=range(1000,1005))
+r3=pd.concat((df1,df2),axis=0,join='inner',sort=False)
+#join作用，当axis=0时，则只保留两个待合并元素中的相同column
+#当axis=1时，则只保留两个待合并元素中的相同index
+r4=pd.concat((df1,df2),axis=1,join='inner',sort=False)
+r5=pd.concat([df1,se1,se2,df2],axis=1,join='outer')
