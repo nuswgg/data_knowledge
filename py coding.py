@@ -129,10 +129,15 @@ df5=pd.DataFrame({'No.':range(1000,1005),
                   'Name':['July','Shiely','Lucy','Lily','Joy'],
                   'Bounce':[3000,1000,1000,2000,5000]})
 
+### after merge only one col 'Name'
 #df1.merge(df2,on='Name')
+
+### col-index merge, result only has one col 'Name'
 #r1=df1.merge(df2.set_index('Name'),left_on='Name',right_index=True)
+
 #col-index join, must have on
 #r1=df1.join(df2.set_index('Name'),how='inner',on='Name')
+
 # index-index join, no need on
 r1=df1.set_index('Name').join(df2.set_index('Name'),how='inner')
 print(r1)
